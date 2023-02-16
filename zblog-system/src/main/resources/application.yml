@@ -1,0 +1,45 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: Z-Blog
+  mvc:
+    servlet:
+      path: /api/
+    throw-exception-if-no-handler-found: true
+#  messages:
+#    basename: classpath:/messages
+#    encoding: UTF-8
+#  web:
+#    locale: zh_CN
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5432/zblog
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: jx_zou8023
+#
+#logging:
+#  file:
+#    path: logs
+
+redis:
+  databases:
+    client: 0
+    user: 1
+    business: 10
+  host: localhost
+  port: 6379
+  timeout: 3000
+  pool:
+    max-active: 100
+    max-wait: -1
+    max-idle: 8
+    min-idle: 0
+
+jwt:
+  header: Authorization
+  base64-secret: z-blog
+  token-validity-in-seconds: 14400000
