@@ -22,7 +22,6 @@
 		<module>zblog-mail</module>
 		<module>zblog-auth</module>
 		<module>zblog-upload</module>
-		<module>zblog-redis</module>
 	</modules>
 
 	<properties>
@@ -34,7 +33,8 @@
 		<postgresql>42.5.1</postgresql>
 		<fastjson2>2.0.23</fastjson2>
 		<jnanoid>2.0.0</jnanoid>
-		<jjwt>0.9.1</jjwt>
+		<jwt>9.24.4</jwt>
+		<jasypt>3.0.5</jasypt>
 	</properties>
 
 	<dependencyManagement>
@@ -60,9 +60,14 @@
 				<version>${jnanoid}</version>
 			</dependency>
 			<dependency>
-				<groupId>io.jsonwebtoken</groupId>
-				<artifactId>jjwt</artifactId>
-				<version>${jjwt}</version>
+				<groupId>com.nimbusds</groupId>
+				<artifactId>nimbus-jose-jwt</artifactId>
+				<version>${jwt}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.github.ulisesbocchio</groupId>
+				<artifactId>jasypt-spring-boot-starter</artifactId>
+				<version>${jasypt}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import xyz.jxzou.zblog.common.core.annotation.FileCheck;
-import xyz.jxzou.zblog.common.core.enums.FileType;
-import xyz.jxzou.zblog.common.core.pojo.ResponseResult;
+import xyz.jxzou.zblog.common.util.annotation.FileCheck;
+import xyz.jxzou.zblog.common.util.enums.FileType;
+import xyz.jxzou.zblog.common.util.pojo.ResponseResult;
 import xyz.jxzou.zblog.upload.service.UploadService;
 
 import java.io.IOException;

@@ -20,25 +20,27 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<groupId>xyz.jxzou.zblog.common</groupId>
+			<artifactId>zblog-common-exception</artifactId>
+			<version>0.0.1</version>
 		</dependency>
 		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
+			<groupId>xyz.jxzou.zblog.common</groupId>
+			<artifactId>zblog-common-redis</artifactId>
+			<version>0.0.1</version>
 		</dependency>
 		<dependency>
-			<groupId>com.alibaba.fastjson2</groupId>
-			<artifactId>fastjson2</artifactId>
+			<groupId>xyz.jxzou.zblog.common</groupId>
+			<artifactId>zblog-common-util</artifactId>
+			<version>0.0.1</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.aventrix.jnanoid</groupId>
-			<artifactId>jnanoid</artifactId>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
 		</dependency>
 	</dependencies>
-
 </project>

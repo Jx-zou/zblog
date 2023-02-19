@@ -1,6 +1,6 @@
 package xyz.jxzou.zblog.common.exception.model.asserts;
 
-import xyz.jxzou.zblog.common.core.model.Result;
+import xyz.jxzou.zblog.common.util.model.Result;
 import xyz.jxzou.zblog.common.exception.model.exception.CommonException;
 
 /**
@@ -8,7 +8,7 @@ import xyz.jxzou.zblog.common.exception.model.exception.CommonException;
  *
  * @author jx
  */
-public interface CommonAssert extends BaseAssert, Result {
+public interface CommonAssert extends BaseAssert<CommonException>, Result {
 
     @Override
     default CommonException newException(Object... args) {
@@ -18,5 +18,11 @@ public interface CommonAssert extends BaseAssert, Result {
     @Override
     default CommonException newException(Throwable t, Object... args) {
         return new CommonException(this, args, t);
+    }
+
+    default void isInsertFailed(int insert) throws CommonException {
+        if (insert <= 0) {
+            throw this.newException();
+        }
     }
 }

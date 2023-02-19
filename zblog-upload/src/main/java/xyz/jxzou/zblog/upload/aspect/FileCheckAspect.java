@@ -9,8 +9,8 @@ import org.aspectj.lang.annotation.Before;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import xyz.jxzou.zblog.common.core.annotation.FileCheck;
-import xyz.jxzou.zblog.common.core.enums.FileType;
+import xyz.jxzou.zblog.common.util.annotation.FileCheck;
+import xyz.jxzou.zblog.common.util.enums.FileType;
 
 import java.io.IOException;
 import java.io.InputStream;

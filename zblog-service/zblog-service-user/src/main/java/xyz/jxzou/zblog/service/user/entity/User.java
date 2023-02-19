@@ -4,22 +4,18 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.time.DurationUtils;
 
-import java.sql.Timestamp;
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * The type User.
  */
 @Data
+@Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-@AllArgsConstructor
-@NoArgsConstructor
 @TableName(value = "user", schema = "auth")
 public class User {
 

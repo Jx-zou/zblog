@@ -1,7 +1,7 @@
 package xyz.jxzou.zblog.common.exception.enums;
 
 
-import xyz.jxzou.zblog.common.core.pojo.ResponseResult;
+import xyz.jxzou.zblog.common.util.pojo.ResponseResult;
 import xyz.jxzou.zblog.common.exception.model.asserts.ServletAssert;
 
 /**
@@ -24,18 +24,25 @@ public enum ServletResponseEnum implements ServletAssert {
     CLIENT_ID_ERROR(5121,"clientID错误"),
 
     /**
+     * 认证成功: 2140 -> 2159
      * 认证错误: 5140 -> 5159
      */
+    AUTH_LOGIN_SUCCESS(2140, "登录成功"),
     AUTH_FAILED_ERROR(5140, "认证错误"),
-    AUTH_LOGIN_ERROR(5141, "账户或者密码错误"),
-    PERMISSION_DENIED_ERROR(5142, "权限不足"),
+    AUTH_TOKEN_ERROR(5140, "认证token错误"),
+    AUTH_LOGIN_USERNAME_ERROR(5141, "账户错误"),
+    AUTH_LOGIN_PASSWORD_ERROR(5142, "账户错误"),
+    AUTH_LOGIN_ERROR(5143, "账户或者密码错误"),
+    AUTH_LOGIN_REPEAT_ERROR(5144, "重复登录"),
+    AUTH_LOGOUT_ERROR(5145, "注销失败"),
+    PERMISSION_DENIED_ERROR(5146, "权限不足"),
 
     /**
      * 秘钥错误: 5160 ->
      */
     RSA_GENERATOR_ERROR(5160, "RSA秘钥生成器错误"),
-    RSA_STORE_PUT_ERROR(5161, "秘钥添加失败"),
-    RSA_STORE_GET_ERROR(5162, "秘钥查询失败");
+    RSA_REDIS_PUT_ERROR(5161, "秘钥添加失败"),
+    RSA_REDIS_GET_ERROR(5162, "秘钥查询失败");
 
 
 

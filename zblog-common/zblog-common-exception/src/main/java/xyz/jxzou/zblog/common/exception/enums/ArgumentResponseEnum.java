@@ -1,6 +1,6 @@
 package xyz.jxzou.zblog.common.exception.enums;
 
-import xyz.jxzou.zblog.common.core.pojo.ResponseResult;
+import xyz.jxzou.zblog.common.util.pojo.ResponseResult;
 import xyz.jxzou.zblog.common.exception.model.asserts.ArgumentAssert;
 
 /**

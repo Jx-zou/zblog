@@ -1,7 +1,9 @@
 package xyz.jxzou.zblog.common.exception.model.asserts;
 
 
-import xyz.jxzou.zblog.common.core.model.Result;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.lang.Nullable;
+import xyz.jxzou.zblog.common.util.model.Result;
 import xyz.jxzou.zblog.common.exception.model.exception.ServletException;
 
 /**
@@ -9,7 +11,7 @@ import xyz.jxzou.zblog.common.exception.model.exception.ServletException;
  *
  * @author jx
  */
-public interface ServletAssert extends BaseAssert, Result {
+public interface ServletAssert extends BaseAssert<ServletException>, Result {
     @Override
     default ServletException newException(Object... args) {
         return new ServletException(this, args);
@@ -18,5 +20,17 @@ public interface ServletAssert extends BaseAssert, Result {
     @Override
     default ServletException newException(Throwable t, Object... args) {
         return new ServletException(this, args, t);
+    }
+
+    default void validateClientId(@Nullable String cid) throws ServletException {
+        if (null == cid || cid.length() != 24) {
+            throw this.newException();
+        }
+    }
+
+    default void validateToken(@Nullable String token) throws ServletException {
+        if (StringUtils.isEmpty(token) || !token.startsWith("Bearer ")) {
+            throw this.newException();
+        }
     }
 }

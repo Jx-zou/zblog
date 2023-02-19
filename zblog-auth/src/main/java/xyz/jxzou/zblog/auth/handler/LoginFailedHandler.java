@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
-import xyz.jxzou.zblog.common.core.util.ResponseUtils;
+import xyz.jxzou.zblog.common.util.tool.ResponseUtils;
 import xyz.jxzou.zblog.common.exception.enums.ServletResponseEnum;
 
 import javax.servlet.ServletException;

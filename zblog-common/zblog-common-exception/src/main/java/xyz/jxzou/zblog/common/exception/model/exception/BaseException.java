@@ -1,7 +1,7 @@
 package xyz.jxzou.zblog.common.exception.model.exception;
 
 
-import xyz.jxzou.zblog.common.core.model.Result;
+import xyz.jxzou.zblog.common.util.model.Result;
 
 /**
  * BaseException

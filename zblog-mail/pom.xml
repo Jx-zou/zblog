@@ -34,9 +34,15 @@
 		</dependency>
 
 		<dependency>
+			<groupId>xyz.jxzou.zblog.service</groupId>
+			<artifactId>zblog-service-business</artifactId>
+			<version>0.0.1</version>
+		</dependency>
+
+		<dependency>
 			<groupId>xyz.jxzou.zblog.common</groupId>
 			<artifactId>zblog-common-core</artifactId>
-			<version>${common-exception}</version>
+			<version>0.0.1</version>
 		</dependency>
 	</dependencies>
 </project>

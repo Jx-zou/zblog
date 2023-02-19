@@ -1,13 +1,14 @@
 package xyz.jxzou.zblog.common.core.pojo;
 
+import org.springframework.util.Base64Utils;
+
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.Base64;
 
 public final class RSAKeyPair {
-    private RSAPublicKey publicKey;
+    private final RSAPublicKey publicKey;
 
-    private RSAPrivateKey privateKey;
+    private final RSAPrivateKey privateKey;
 
     /**
      * Instantiates a new Rsa key pair.
@@ -26,7 +27,7 @@ public final class RSAKeyPair {
      * @return the public key
      */
     public RSAPublicKey getPublicKey() {
-        return publicKey;
+        return this.publicKey;
     }
 
     /**
@@ -35,14 +36,14 @@ public final class RSAKeyPair {
      * @return the private key
      */
     public RSAPrivateKey getPrivateKey() {
-        return privateKey;
+        return this.privateKey;
     }
 
     public String getBase64PublicKey() {
-        return Base64.getEncoder().encodeToString(publicKey.getEncoded());
+        return Base64Utils.encodeToString(publicKey.getEncoded());
     }
 
     public String getBase64PrivateKey() {
-        return Base64.getEncoder().encodeToString(privateKey.getEncoded());
+        return Base64Utils.encodeToString(privateKey.getEncoded());
     }
 }

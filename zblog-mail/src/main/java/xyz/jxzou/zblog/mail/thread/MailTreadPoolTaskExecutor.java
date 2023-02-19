@@ -3,7 +3,7 @@ package xyz.jxzou.zblog.mail.thread;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
-import xyz.jxzou.zblog.mail.config.ThreadPoolConfig;
+import xyz.jxzou.zblog.mail.config.ThreadPool;
 
 /**
  * MailTreadPoolTaskExecutor
@@ -16,7 +16,7 @@ public class MailTreadPoolTaskExecutor extends ThreadPoolTaskExecutor {
     private static final long serialVersionUID = -7071021297991383051L;
 
     private static final String THREAD_NAME_PREFIX = "[Mail] mailTaskExecutor--";
-    private ThreadPoolConfig config;
+    private ThreadPool config;
 
     /**
      * Instantiates a new Mail tread pool task executor.
@@ -24,7 +24,7 @@ public class MailTreadPoolTaskExecutor extends ThreadPoolTaskExecutor {
      * @param config the config
      */
     @Autowired
-    public MailTreadPoolTaskExecutor(ThreadPoolConfig config) {
+    public MailTreadPoolTaskExecutor(ThreadPool config) {
         this.config = config;
     }
 

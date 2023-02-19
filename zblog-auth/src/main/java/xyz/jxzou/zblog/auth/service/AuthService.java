@@ -1,92 +1,41 @@
 package xyz.jxzou.zblog.auth.service;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Base64Utils;
-import xyz.jxzou.zblog.auth.pojo.AuthContent;
-import xyz.jxzou.zblog.auth.vo.JwtUser;
-import xyz.jxzou.zblog.common.core.pojo.RSAKeyPair;
-import xyz.jxzou.zblog.common.core.util.RSAUtils;
-import xyz.jxzou.zblog.common.exception.enums.ServletResponseEnum;
-import xyz.jxzou.zblog.common.exception.model.exception.BaseException;
-import xyz.jxzou.zblog.redis.processor.DynamicRedisTemplateProcessor;
-import xyz.jxzou.zblog.service.user.entity.Permission;
-import xyz.jxzou.zblog.service.user.entity.Role;
-import xyz.jxzou.zblog.service.user.entity.User;
-import xyz.jxzou.zblog.service.user.mapper.PermissionMapper;
-import xyz.jxzou.zblog.service.user.mapper.RoleMapper;
-import xyz.jxzou.zblog.service.user.mapper.UserMapper;
+import xyz.jxzou.zblog.auth.domain.vo.JwtUser;
+import xyz.jxzou.zblog.auth.domain.vo.RUserVo;
+import xyz.jxzou.zblog.common.util.pojo.ResponseResult;
+import xyz.jxzou.zblog.common.exception.model.exception.ServletException;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 /**
  * The type Auth service.
  */
-@Slf4j
-@Service
-@Transactional
-public class AuthService implements UserDetailsService {
+public interface AuthService extends UserDetailsService {
 
-    private final RedisTemplate<String, Object> userRedisTemplate;
-    private final RedisTemplate<String, Object> clientRedisTemplate;
-    private final UserMapper userMapper;
-    private final RoleMapper roleMapper;
-    private final PermissionMapper permissionMapper;
-
-    /**
-     * Instantiates a new Auth service.
-     *
-     * @param processor        the processor
-     * @param userMapper       the user mapper
-     * @param roleMapper       the role mapper
-     * @param permissionMapper the permission mapper
-     */
-    @Autowired
-    public AuthService(DynamicRedisTemplateProcessor processor, UserMapper userMapper, RoleMapper roleMapper, PermissionMapper permissionMapper) {
-        this.userRedisTemplate = processor.getRedisTemplate(AuthContent.USER_DATABASE_NAME);
-        this.clientRedisTemplate = processor.getRedisTemplate(AuthContent.CLIENT_DATABASE_NAME);
-        this.userMapper = userMapper;
-        this.roleMapper = roleMapper;
-        this.permissionMapper = permissionMapper;
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String account) throws UsernameNotFoundException {
-        User user = userMapper.findByAccountOrPhoneOrMail(account);
-        if (user == null) {
-            throw new UsernameNotFoundException("该用户不存在");
-        }
-        List<Role> roles = roleMapper.findNameAndIdByUserId(user.getId());
-        List<Long> roleIds = roles.stream().map(Role::getId).collect(Collectors.toList());
-        List<Permission> permissions = permissionMapper.findUrlByRoleIds(roleIds);
-        return JwtUser.create(user, roles, permissions);
-    }
+    UserDetails loadUserByUsername(String account) throws UsernameNotFoundException;
 
     /**
      * Create public key string.
      *
-     * @param clientId the client id
+     * @param cid the cid
      * @return the string
-     * @throws BaseException the base exception
+     * @throws ServletException the servlet exception
      */
-    public String createPublicKey(String clientId) throws BaseException {
-        ServletResponseEnum.CLIENT_ID_ERROR.isNull(clientId);
-        clientId = Arrays.toString(Base64Utils.decodeFromString(clientId));
-        if (clientId.length() != 24) {
-            throw ServletResponseEnum.CLIENT_ID_ERROR.newException();
-        }
-        RSAKeyPair rsaKeyPair = RSAUtils.generateRSAKeyPair();
-        clientRedisTemplate.opsForHash().put(clientId, "privateKey", rsaKeyPair.getBase64PrivateKey());
-        clientRedisTemplate.expire(clientId, AuthContent.CLIENT_DATABASE_EXPIRE, TimeUnit.HOURS);
-        return rsaKeyPair.getBase64PublicKey();
-    }
+    Map<String, String> createPublicKey(String cid) throws Exception;
+
+    /**
+     * Login string.
+     *
+     * @param authUser 认证封装对象
+     * @param cid   cid
+     * @return the string
+     * @throws Exception the exception
+     */
+    String login(JwtUser authUser, String cid) throws Exception;
+
+
+    ResponseResult<Void> registry(RUserVo rUserVo, String cid) throws Exception;
 }

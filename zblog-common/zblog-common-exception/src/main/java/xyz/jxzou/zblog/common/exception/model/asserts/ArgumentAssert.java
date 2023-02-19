@@ -1,6 +1,6 @@
 package xyz.jxzou.zblog.common.exception.model.asserts;
 
-import xyz.jxzou.zblog.common.core.model.Result;
+import xyz.jxzou.zblog.common.util.model.Result;
 import xyz.jxzou.zblog.common.exception.model.exception.ArgumentException;
 
 /**
@@ -8,7 +8,7 @@ import xyz.jxzou.zblog.common.exception.model.exception.ArgumentException;
  *
  * @author jx
  */
-public interface ArgumentAssert extends BaseAssert, Result {
+public interface ArgumentAssert extends BaseAssert<ArgumentException>, Result {
     @Override
     default ArgumentException newException(Object... args) {
         return new ArgumentException(this, args);

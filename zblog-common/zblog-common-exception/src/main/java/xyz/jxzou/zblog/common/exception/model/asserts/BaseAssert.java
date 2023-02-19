@@ -1,7 +1,7 @@
 package xyz.jxzou.zblog.common.exception.model.asserts;
 
 import org.springframework.lang.Nullable;
-import xyz.jxzou.zblog.common.core.pojo.ResponseResult;
+import xyz.jxzou.zblog.common.util.pojo.ResponseResult;
 import xyz.jxzou.zblog.common.exception.model.exception.BaseException;
 
 import java.util.Collection;
@@ -11,13 +11,13 @@ import java.util.Collection;
  *
  * @author jx
  */
-public interface BaseAssert {
+public interface BaseAssert<E extends BaseException> {
 
     ResponseResult<Void> getResult();
 
-    BaseException newException(Object... args);
+    E newException(Object... args);
 
-    BaseException newException(Throwable t, Object... args);
+    E newException(Throwable t, Object... args);
 
     default void isNull(@Nullable Object obj) throws BaseException {
         if (obj == null) {

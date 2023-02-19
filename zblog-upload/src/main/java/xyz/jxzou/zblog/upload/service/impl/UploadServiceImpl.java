@@ -2,7 +2,7 @@ package xyz.jxzou.zblog.upload.service.impl;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import xyz.jxzou.zblog.common.core.util.FileUtils;
+import xyz.jxzou.zblog.common.util.tool.FileUtils;
 import xyz.jxzou.zblog.upload.service.UploadService;
 
 import java.io.IOException;

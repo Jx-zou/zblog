@@ -27,6 +27,11 @@
 
 		<dependency>
 			<groupId>xyz.jxzou.zblog.common</groupId>
+			<artifactId>zblog-common-core</artifactId>
+			<version>0.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>xyz.jxzou.zblog.common</groupId>
 			<artifactId>zblog-common-db</artifactId>
 			<version>0.0.1</version>
 		</dependency>

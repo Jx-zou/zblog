@@ -13,8 +13,10 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>zblog-common-exception</module>
-		<module>zblog-common-core</module>
+		<module>zblog-common-util</module>
 		<module>zblog-common-db</module>
+		<module>zblog-common-core</module>
+		<module>zblog-common-redis</module>
 	</modules>
 
 	<properties>

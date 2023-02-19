@@ -15,8 +15,6 @@
 		<maven.compiler.source>8</maven.compiler.source>
 		<maven.compiler.target>8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-		<common.version>0.0.1</common.version>
 	</properties>
 
 	<dependencies>
@@ -27,8 +25,13 @@
 
 		<dependency>
 			<groupId>xyz.jxzou.zblog.common</groupId>
-			<artifactId>zblog-common-exception</artifactId>
-			<version>${common.version}</version>
+			<artifactId>zblog-common-core</artifactId>
+			<version>0.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>xyz.jxzou.zblog.common</groupId>
+			<artifactId>zblog-common-db</artifactId>
+			<version>0.0.1</version>
 		</dependency>
 	</dependencies>
 

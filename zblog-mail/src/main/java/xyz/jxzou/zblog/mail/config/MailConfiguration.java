@@ -1,24 +1,27 @@
 package xyz.jxzou.zblog.mail.config;
 
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 /**
  * MailConfiguration
  *
  * @author Jx
  **/
+@Data
 @Configuration
 @ConfigurationProperties("mail")
 public class MailConfiguration {
 
-    private ThreadPoolConfig threadPool;
+    private Captcha captcha;
+    private ThreadPool threadPool;
 
-    public ThreadPoolConfig getThreadPool() {
-        return threadPool;
-    }
-
-    public void setThreadPool(ThreadPoolConfig threadPool) {
-        this.threadPool = threadPool;
+    @Bean
+    public JavaMailSender javaMailSender() {
+        return new JavaMailSenderImpl();
     }
 }

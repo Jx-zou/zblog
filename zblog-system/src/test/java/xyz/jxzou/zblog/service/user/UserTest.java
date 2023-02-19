@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 import xyz.jxzou.zblog.service.user.entity.User;
 import xyz.jxzou.zblog.service.user.mapper.UserMapper;
 
@@ -24,12 +25,13 @@ public class UserTest {
 
     @Test
     public void insert() {
-        User user = new User();
-        user.setSecret(passwordEncoder.encode("jx_zou8023"));
-        user.setNickname("Jx");
-        user.setMail("jx.zou@foxmail.com");
-        user.setAvatar("https://www.jxzou.com/images/head.png");
-        user.setProfile("Hi!");
+        User user = User.builder()
+                .secret(passwordEncoder.encode("jx_zou8023"))
+                .nickname("Jx")
+                .mail("jx.zou@foxmail.com")
+                .avatar("https://www.jxzou.com/images/head.png")
+                .profile("Hi!")
+                .build();
 
         if(userMapper.insert(user) > 0) {
             System.out.println("添加成功");

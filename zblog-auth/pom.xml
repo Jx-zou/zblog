@@ -16,6 +16,7 @@
 		<maven.compiler.source>8</maven.compiler.source>
 		<maven.compiler.target>8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
 	</properties>
 
 	<dependencies>
@@ -25,22 +26,17 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-oauth2-client</artifactId>
+			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt</artifactId>
+			<groupId>com.nimbusds</groupId>
+			<artifactId>nimbus-jose-jwt</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>xyz.jxzou.zblog</groupId>
-			<artifactId>zblog-redis</artifactId>
-			<version>0.0.1</version>
-		</dependency>
 		<dependency>
 			<groupId>xyz.jxzou.zblog.service</groupId>
 			<artifactId>zblog-service-user</artifactId>

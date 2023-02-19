@@ -16,8 +16,6 @@
 		<maven.compiler.source>8</maven.compiler.source>
 		<maven.compiler.target>8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-		<common-core>0.0.1</common-core>
 	</properties>
 
 	<dependencies>
@@ -27,8 +25,8 @@
 		</dependency>
 		<dependency>
 			<groupId>xyz.jxzou.zblog.common</groupId>
-			<artifactId>zblog-common-core</artifactId>
-			<version>${common-core}</version>
+			<artifactId>zblog-common-util</artifactId>
+			<version>0.0.1</version>
 		</dependency>
 	</dependencies>
 </project>
