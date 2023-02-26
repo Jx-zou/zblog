@@ -2,7 +2,6 @@ package xyz.jxzou.zblog.mail.enums;
 
 import lombok.Data;
 
-
 public enum MailType {
 
     CAPTCHA(1,"captcha", "验证码");

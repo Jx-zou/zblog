@@ -7,17 +7,21 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import xyz.jxzou.zblog.auth.config.AuthProperties;
-import xyz.jxzou.zblog.auth.domain.dto.Payload;
-import xyz.jxzou.zblog.auth.domain.vo.JwtUser;
+import xyz.jxzou.zblog.auth.domain.pojo.dto.JwtPayload;
+import xyz.jxzou.zblog.auth.domain.pojo.dto.JwtUser;
 import xyz.jxzou.zblog.auth.util.JwtTokenUtil;
-import xyz.jxzou.zblog.common.exception.enums.ServletResponseEnum;
-import xyz.jxzou.zblog.common.core.pojo.RSAKeyPair;
+import xyz.jxzou.zblog.common.core.config.JwtProp;
+import xyz.jxzou.zblog.common.core.domain.pojo.CommonContent;
+import xyz.jxzou.zblog.common.core.domain.pojo.SafetyManager;
 import xyz.jxzou.zblog.common.core.util.RSAUtils;
+import xyz.jxzou.zblog.common.exception.enums.CommonResponseEnum;
+import xyz.jxzou.zblog.common.exception.enums.ServletResponseEnum;
+import xyz.jxzou.zblog.common.util.tool.ResponseUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.FilterChain;
@@ -26,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.interfaces.RSAPrivateKey;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -33,12 +38,12 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
 
-    private final RSAKeyPair rsaKeyPair;
+    private final SafetyManager safetyManager;
     private final JwtTokenUtil jwtTokenUtil;
-    private final AuthProperties authProperties;
-    @Resource(name = "userRedisTemplate")
+    private final JwtProp jwtProp;
+    @Resource
     private RedisTemplate<String, Object> userRedisTemplate;
-    @Resource(name = "clientRedisTemplate")
+    @Resource
     private RedisTemplate<String, Object> clientRedisTemplate;
 
     @Override
@@ -58,40 +63,46 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             final String token = authToken.split(" ")[1].trim();
 
             //解析token获得内容对象
-            Payload payload = jwtTokenUtil.verify(token, rsaKeyPair.getPublicKey());
+            JwtPayload payload = jwtTokenUtil.verify(token, safetyManager.getRsaPublicKey());
 
             //获取cid
             String cid = payload.getCid();
             ServletResponseEnum.CLIENT_ID_ERROR.isBlank(cid);
 
             //解密cid获得clientId并验证
-            RSAPrivateKey privateKey = rsaKeyPair.getPrivateKey();
-            String clientId = RSAUtils.base64Decrypt(cid, privateKey.getEncoded());
+            RSAPrivateKey rsaprivateKey = safetyManager.getRsaPrivetKey();
+            String clientId = RSAUtils.base64Decrypt(cid, rsaprivateKey);
             ServletResponseEnum.CLIENT_ID_ERROR.validateClientId(clientId);
 
             //获取username并验证
-            String username = payload.getUsername();
+            String username = payload.getAccount();
             ServletResponseEnum.AUTH_LOGIN_USERNAME_ERROR.isBlank(username);
 
             //从clientRedis库获取userId并验证
-            String userId = (String) clientRedisTemplate.opsForHash().get(clientId, username);
+            String userId = (String) clientRedisTemplate.opsForHash().get(CommonContent.REDIS_PREFIX_CLIENT + clientId, username);
             ServletResponseEnum.AUTH_FAILED_ERROR.isBlank(userId);
 
             //据userId从userRedis库获取JwtUser对象,获取其用户信息
-            JwtUser jwtUser = (JwtUser) userRedisTemplate.opsForValue().get(userId);
+            JwtUser jwtUser = (JwtUser) userRedisTemplate.opsForValue().get(CommonContent.REDIS_PREFIX_USER + userId);
             ServletResponseEnum.AUTH_FAILED_ERROR.isNull(jwtUser);
 
             //重置user的过期时间
-            userRedisTemplate.expire(userId, authProperties.getJwt().getExpire(), TimeUnit.HOURS);
+            userRedisTemplate.expire(CommonContent.REDIS_PREFIX_USER + userId, jwtProp.getAccessExpire(), TimeUnit.SECONDS);
+
+            Collection<? extends GrantedAuthority> authorities = jwtUser.getAuthorities();
+            ServletResponseEnum.PERMISSION_DENIED_ERROR.isEmpty(authorities);
+
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(jwtUser, null, jwtUser.getAuthorities());
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
+            request.setAttribute("userId", userId);
+
             filterChain.doFilter(request, response);
         } catch (Exception e) {
             log.error("认证失败");
-            filterChain.doFilter(request, response);
+            ResponseUtils.writeJson(response, CommonResponseEnum.ERROR.getResult());
         }
     }
 }

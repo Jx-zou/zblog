@@ -1,11 +1,10 @@
 package xyz.jxzou.zblog.common.core.util;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.Base64Utils;
-import xyz.jxzou.zblog.common.core.pojo.RSAKeyPair;
+import org.apache.tomcat.util.codec.binary.Base64;
+import xyz.jxzou.zblog.common.core.domain.pojo.RSAKeyPair;
 
 import javax.crypto.Cipher;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -15,7 +14,6 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 
 /**
  * The type Rsa utils.
@@ -88,105 +86,52 @@ public class RSAUtils {
     /**
      * Encrypt byte [ ].
      *
-     * @param plaintext the plaintext
-     * @param publicKey the public key
+     * @param plaintext    the plaintext
+     * @param rsapublicKey the rsapublic key
      * @return the byte [ ]
      * @throws Exception the exception
      */
-    public static byte[] encrypt(byte[] plaintext, byte[] publicKey) throws Exception {
-        RSAPublicKey rsaPublicKey = (RSAPublicKey) rsaKeyFactory.generatePublic(new X509EncodedKeySpec(publicKey));
+    public static byte[] encrypt(byte[] plaintext, RSAPublicKey rsapublicKey) throws Exception {
         Cipher cipher = Cipher.getInstance("RSA");
-        cipher.init(Cipher.ENCRYPT_MODE, rsaPublicKey);
+        cipher.init(Cipher.ENCRYPT_MODE, rsapublicKey);
         return cipher.doFinal(plaintext);
-    }
-
-    /**
-     * Encrypt string.
-     *
-     * @param plaintext the plaintext
-     * @param publicKey the public key
-     * @param charset   the charset
-     * @return the string
-     * @throws Exception the exception
-     */
-    public static String encrypt(String plaintext, byte[] publicKey, Charset charset) throws Exception {
-        return new String(encrypt(plaintext.getBytes(charset), publicKey));
-    }
-
-    /**
-     * Encrypt string.
-     *
-     * @param plaintext the plaintext
-     * @param publicKey the public key
-     * @return the string
-     * @throws Exception the exception
-     */
-    public static String encrypt(String plaintext, byte[] publicKey) throws Exception {
-        return new String(encrypt(plaintext.getBytes(StandardCharsets.UTF_8), publicKey));
     }
 
     /**
      * Base 64 encrypt string.
      *
-     * @param plaintext the plaintext
-     * @param publicKey the public key
+     * @param plaintext    the plaintext
+     * @param rsapublicKey the rsapublic key
      * @return the string
      * @throws Exception the exception
      */
-    public static String base64Encrypt(String plaintext, byte[] publicKey) throws Exception {
-        return Base64Utils.encodeToString(encrypt(plaintext.getBytes(StandardCharsets.UTF_8), publicKey));
+    public static String base64Encrypt(String plaintext, RSAPublicKey rsapublicKey) throws Exception {
+        return Base64.encodeBase64String(encrypt(plaintext.getBytes(StandardCharsets.UTF_8), rsapublicKey));
     }
 
     /**
      * Decrypt byte [ ].
      *
-     * @param ciphertext the ciphertext
-     * @param privateKey the private key
+     * @param ciphertext    the ciphertext
+     * @param rsaPrivateKey the rsa private key
      * @return the byte [ ]
      * @throws Exception the exception
      */
-    public static byte[] decrypt(byte[] ciphertext, byte[] privateKey) throws Exception {
-        RSAPrivateKey rsaPrivateKey = (RSAPrivateKey) rsaKeyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKey));
+    public static byte[] decrypt(byte[] ciphertext, RSAPrivateKey rsaPrivateKey) throws Exception {
         Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.DECRYPT_MODE, rsaPrivateKey);
-        return cipher.doFinal(cipher.doFinal(ciphertext));
-    }
-
-    /**
-     * Decrypt string.
-     *
-     * @param ciphertext the ciphertext
-     * @param privateKey the private key
-     * @param charset    the charset
-     * @return the string
-     * @throws Exception the exception
-     */
-    public static String decrypt(String ciphertext, byte[] privateKey, Charset charset) throws Exception {
-        return new String(decrypt(ciphertext.getBytes(charset), privateKey));
-    }
-
-    /**
-     * Decrypt string.
-     *
-     * @param ciphertext the ciphertext
-     * @param privateKey the private key
-     * @return the string
-     * @throws Exception the exception
-     */
-    public static String decrypt(String ciphertext, byte[] privateKey) throws Exception {
-        return new String(decrypt(ciphertext.getBytes(StandardCharsets.UTF_8), privateKey));
+        return cipher.doFinal(ciphertext);
     }
 
     /**
      * Base 64 decrypt string.
      *
-     * @param ciphertext the ciphertext
-     * @param privateKey the private key
+     * @param ciphertext    the ciphertext
+     * @param rsaPrivateKey the rsa private key
      * @return the string
      * @throws Exception the exception
      */
-    public static String base64Decrypt(String ciphertext, byte[] privateKey) throws Exception {
-        byte[] base64Ciphertext = Base64Utils.decodeFromString(ciphertext);
-        return new String(decrypt(base64Ciphertext, privateKey));
+    public static String base64Decrypt(String ciphertext, RSAPrivateKey rsaPrivateKey) throws Exception {
+        return new String(decrypt(Base64.decodeBase64(ciphertext), rsaPrivateKey));
     }
 }

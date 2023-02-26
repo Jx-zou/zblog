@@ -1,12 +1,7 @@
-mail:
-  captcha:
-    size: 6
-    expire: 60
-
 spring:
   mail:
     username: jx.zou@foxmail.com
-    password: mpwhipofrutlcbdj
+    password: vhgocldxoevfbicb
     host: smtp.qq.com
     port: 465
     protocol: smtps

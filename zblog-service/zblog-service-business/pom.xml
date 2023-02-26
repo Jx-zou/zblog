@@ -19,6 +19,10 @@
 	</properties>
 
 	<dependencies>
-
+		<dependency>
+			<groupId>xyz.jxzou.zblog.service</groupId>
+			<artifactId>zblog-service-user</artifactId>
+			<version>0.0.1</version>
+		</dependency>
 	</dependencies>
 </project>

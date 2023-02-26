@@ -3,7 +3,7 @@ package xyz.jxzou.zblog.service.user.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
-import xyz.jxzou.zblog.service.user.entity.Role;
+import xyz.jxzou.zblog.service.user.domain.entity.Role;
 
 import java.util.List;
 

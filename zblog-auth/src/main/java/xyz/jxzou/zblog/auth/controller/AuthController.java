@@ -1,27 +1,36 @@
 package xyz.jxzou.zblog.auth.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import xyz.jxzou.zblog.auth.domain.vo.JwtUser;
-import xyz.jxzou.zblog.auth.domain.vo.RUserVo;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import xyz.jxzou.zblog.auth.domain.pojo.vo.LUserVo;
+import xyz.jxzou.zblog.auth.domain.pojo.vo.RUserVo;
 import xyz.jxzou.zblog.auth.service.AuthService;
-import xyz.jxzou.zblog.common.util.pojo.ResponseResult;
+import xyz.jxzou.zblog.common.core.domain.pojo.CommonContent;
 import xyz.jxzou.zblog.common.exception.enums.CommonResponseEnum;
 import xyz.jxzou.zblog.common.exception.enums.ServletResponseEnum;
-import xyz.jxzou.zblog.common.core.pojo.ZBlogContent;
+import xyz.jxzou.zblog.common.util.annotation.FileCheck;
+import xyz.jxzou.zblog.common.util.enums.FileType;
+import xyz.jxzou.zblog.common.util.pojo.ResponseResult;
+import xyz.jxzou.zblog.auth.domain.pojo.vo.UserinfoVo;
+import xyz.jxzou.zblog.upload.domain.vo.FileVo;
 
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
  * The type Auth controller.
  */
-@CrossOrigin()
+@Slf4j
 @Validated
 @RestController
 @RequiredArgsConstructor
@@ -32,36 +41,68 @@ public class AuthController {
     /**
      * Gets public key.
      *
-     * @param response the response
+     * @param cid the cid
      * @return the public key
+     * @throws Exception the exception
      */
     @PostMapping("pkey")
-    public ResponseResult<Void> getPublicKey(@RequestHeader @Size(min = 24, max = 24) String cid, HttpServletResponse response) throws Exception {
-        Map<String, String> map = authService.createPublicKey(cid);
-        response.setHeader(ZBlogContent.PUBLICKEY_HEADER_NAME, map.get("pkey"));
-        response.setHeader(ZBlogContent.CLIENT_HEADER_NAME, map.get("cid"));
-        return CommonResponseEnum.GET_SUCCESS.getResult();
+    public ResponseResult<Map<String, String>> getPublicKey(@RequestHeader @NotBlank String cid) throws Exception {
+        return CommonResponseEnum.GET_SUCCESS.getResult(authService.createPublicKey(cid));
     }
 
     /**
      * Login response result.
      *
-     * @param jwtUser the jwt user
+     * @param user    the jwt user
+     * @param request the request
      * @return the response result
+     * @throws Exception the exception
      */
     @PostMapping("login")
-    public ResponseResult<Void> login(@RequestBody @Valid JwtUser jwtUser, @RequestHeader @NotBlank String cid, HttpServletResponse response) throws Exception {
-        response.setHeader(HttpHeaders.AUTHORIZATION, authService.login(jwtUser, cid));
-        return ServletResponseEnum.AUTH_LOGIN_SUCCESS.getResult();
+    public ResponseResult<Map<String, String>> login(@RequestBody @Valid LUserVo user, HttpServletRequest request) throws Exception {
+        return ServletResponseEnum.AUTH_LOGIN_SUCCESS.getResult(authService.login(user, (String) request.getAttribute(CommonContent.HTTP_HEADER_CLIENT)));
     }
 
     /**
      * Registry response result.
      *
+     * @param user    the user
+     * @param request the request
      * @return the response result
+     * @throws Exception the exception
      */
     @PostMapping("registry")
-    public ResponseResult<Void> registry(@RequestBody @Valid RUserVo rUserVo, @RequestHeader @NotBlank String cid) throws Exception {
-        return authService.registry(rUserVo, cid);
+    public ResponseResult<Void> registry(@RequestBody @Valid RUserVo user, HttpServletRequest request) throws Exception {
+        return authService.registry(user, (String) request.getAttribute(CommonContent.HTTP_HEADER_CLIENT));
+    }
+
+    /**
+     * Change response result.
+     *
+     * @param userinfoVo the userinfo vo
+     * @param request    the request
+     * @return the response result
+     * @throws Exception the exception
+     */
+    @PostMapping("info/change")
+    public ResponseResult<Void> change(@RequestBody @Valid UserinfoVo userinfoVo, HttpServletRequest request) throws Exception {
+        authService.changeUserinfo(userinfoVo, (String) request.getAttribute("userId"));
+        return CommonResponseEnum.SUCCESS.getResult();
+    }
+
+    /**
+     * Photo response result.
+     *
+     * @param file the file
+     * @return the response result
+     * @throws IOException the io exception
+     */
+    @PostMapping("upload/avatar")
+    @FileCheck(
+            supportedSuffixes = {"png", "jpg", "jpeg"},
+            type = FileCheck.CheckType.SUFFIX_MAGIC_NUMBER,
+            supportedFileTypes = {FileType.PNG, FileType.JPG, FileType.JPEG})
+    public ResponseResult<FileVo> photo(MultipartFile file) throws IOException {
+        return CommonResponseEnum.SUCCESS.getResult(authService.uploadAvatar(file));
     }
 }

@@ -1,13 +1,15 @@
 package xyz.jxzou.zblog.service.user;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import xyz.jxzou.zblog.service.user.entity.User;
+import xyz.jxzou.zblog.service.user.domain.entity.User;
 import xyz.jxzou.zblog.service.user.mapper.UserMapper;
 
+@Slf4j
 @SpringBootTest
 public class UserTest {
 
@@ -38,5 +40,11 @@ public class UserTest {
         } else {
             System.out.println("添加失败");
         }
+    }
+
+    @Test
+    public void find() {
+        User user = userMapper.findByAccountOrPhoneOrMail("501667967@qq.com");
+        log.info(user.toString());
     }
 }

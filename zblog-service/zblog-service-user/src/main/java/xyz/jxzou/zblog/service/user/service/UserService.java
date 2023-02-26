@@ -1,7 +1,6 @@
 package xyz.jxzou.zblog.service.user.service;
 
-import xyz.jxzou.zblog.service.user.entity.User;
-
 public interface UserService {
 
+    void change(String nickname, String desc, String userId);
 }

@@ -33,6 +33,11 @@ public enum ArgumentResponseEnum implements ArgumentAssert {
 
     @Override
     public ResponseResult<Void> getResult() {
-        return new ResponseResult<Void>(status, message);
+        return new ResponseResult<Void>(this.status, this.message);
+    }
+
+    @Override
+    public <T> ResponseResult<T> getResult(T data) {
+        return new ResponseResult<T>(this.status, this.message, data);
     }
 }

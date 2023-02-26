@@ -12,7 +12,6 @@ import xyz.jxzou.zblog.redis.config.RedisProperties;
 import xyz.jxzou.zblog.redis.pojo.FastJson2JsonRedisSerializer;
 
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -77,4 +76,6 @@ public class DynamicRedisTemplateProcessor {
     public RedisTemplate<String, Object> getRedisTemplate(String name) {
         return redisTemplateMap.get(name);
     }
+
+
 }

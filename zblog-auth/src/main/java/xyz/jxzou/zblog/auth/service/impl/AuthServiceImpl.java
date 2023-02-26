@@ -3,44 +3,51 @@ package xyz.jxzou.zblog.auth.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Base64Utils;
-import xyz.jxzou.zblog.auth.config.AuthProperties;
-import xyz.jxzou.zblog.auth.domain.dto.Payload;
-import xyz.jxzou.zblog.auth.domain.vo.JwtUser;
-import xyz.jxzou.zblog.auth.domain.vo.RUserVo;
+import org.springframework.web.multipart.MultipartFile;
+import xyz.jxzou.zblog.auth.domain.pojo.dto.JwtPayload;
+import xyz.jxzou.zblog.auth.domain.pojo.dto.JwtUser;
+import xyz.jxzou.zblog.auth.domain.pojo.vo.LUserVo;
+import xyz.jxzou.zblog.auth.domain.pojo.vo.RUserVo;
 import xyz.jxzou.zblog.auth.service.AuthService;
 import xyz.jxzou.zblog.auth.util.JwtTokenUtil;
+import xyz.jxzou.zblog.common.core.config.CaptchaProp;
+import xyz.jxzou.zblog.common.core.config.JwtProp;
+import xyz.jxzou.zblog.common.core.domain.pojo.CommonContent;
+import xyz.jxzou.zblog.common.core.domain.pojo.SafetyManager;
+import xyz.jxzou.zblog.common.core.util.RSAUtils;
+import xyz.jxzou.zblog.common.exception.enums.BusinessResponseEnum;
+import xyz.jxzou.zblog.common.exception.enums.ServletResponseEnum;
+import xyz.jxzou.zblog.common.exception.model.exception.ServletException;
 import xyz.jxzou.zblog.common.util.pojo.ResponseResult;
 import xyz.jxzou.zblog.common.util.tool.Maps;
 import xyz.jxzou.zblog.common.util.tool.NanoIDUtils;
-import xyz.jxzou.zblog.common.exception.enums.BusinessResponseEnum;
-import xyz.jxzou.zblog.common.exception.enums.CommonResponseEnum;
-import xyz.jxzou.zblog.common.exception.enums.ServletResponseEnum;
-import xyz.jxzou.zblog.common.exception.model.exception.ServletException;
-import xyz.jxzou.zblog.common.core.pojo.RSAKeyPair;
-import xyz.jxzou.zblog.common.core.pojo.ZBlogContent;
-import xyz.jxzou.zblog.common.core.util.RSAUtils;
-import xyz.jxzou.zblog.service.user.entity.Permission;
-import xyz.jxzou.zblog.service.user.entity.Role;
-import xyz.jxzou.zblog.service.user.entity.User;
-import xyz.jxzou.zblog.service.user.entity.UserRole;
+import xyz.jxzou.zblog.service.user.domain.entity.Role;
+import xyz.jxzou.zblog.service.user.domain.entity.User;
+import xyz.jxzou.zblog.service.user.domain.entity.UserRole;
+import xyz.jxzou.zblog.auth.domain.pojo.vo.UserinfoVo;
 import xyz.jxzou.zblog.service.user.mapper.PermissionMapper;
 import xyz.jxzou.zblog.service.user.mapper.RoleMapper;
 import xyz.jxzou.zblog.service.user.mapper.UserMapper;
 import xyz.jxzou.zblog.service.user.mapper.UserRoleMapper;
+import xyz.jxzou.zblog.service.user.service.UserService;
+import xyz.jxzou.zblog.upload.domain.vo.FileVo;
+import xyz.jxzou.zblog.upload.service.UploadService;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.security.interfaces.RSAPrivateKey;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -53,14 +60,19 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    private final RSAKeyPair rsaKeyPair;
-    private final AuthProperties authProperties;
+    private final JwtProp jwtProp;
+    private final CaptchaProp captchaProp;
+    private final SafetyManager safetyManager;
     private final JwtTokenUtil jwtTokenUtil;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final UserMapper userMapper;
     private final RoleMapper roleMapper;
     private final PermissionMapper permissionMapper;
     private final UserRoleMapper userRoleMapper;
+    private final PasswordEncoder passwordEncoder;
+
+    private final UserService userService;
+    private final UploadService uploadService;
 
     @Resource
     private RedisTemplate<String, Object> userRedisTemplate;
@@ -77,8 +89,10 @@ public class AuthServiceImpl implements AuthService {
         }
         List<Role> roles = roleMapper.findNameAndIdByUserId(user.getId());
         List<Long> roleIds = roles.stream().map(Role::getId).collect(Collectors.toList());
-        List<Permission> permissions = permissionMapper.findUrlByRoleIds(roleIds);
-        return JwtUser.create(user, roles, permissions);
+        List<String> urls = permissionMapper.findUrlsByRoleIds(roleIds);
+        log.info(urls.toString());
+
+        return JwtUser.create(user, roles, urls);
     }
 
     /**
@@ -89,15 +103,14 @@ public class AuthServiceImpl implements AuthService {
      * @throws ServletException the servlet exception
      */
     @Override
-    public Map<String, String> createPublicKey(String cid) throws Exception {
+    public Map<String,String> createPublicKey(String cid) throws Exception {
         cid = new String(Base64Utils.decodeFromString(cid));
         ServletResponseEnum.CLIENT_ID_ERROR.validateClientId(cid);
         String clientId = NanoIDUtils.alphanumericId();
-        clientRedisTemplate.opsForHash().put(clientId, ZBlogContent.CLIENT_REDIS_CREATE_TIME_NAME, LocalDateTime.now());
-        clientRedisTemplate.expire(clientId, authProperties.getClient().getExpire(), TimeUnit.HOURS);
+        clientRedisTemplate.opsForHash().put(CommonContent.REDIS_PREFIX_CLIENT + clientId, CommonContent.REDIS_NAME_CLIENT_CREATE_TIME, LocalDateTime.now());
         return new Maps<String, String>()
-                .put("clientId", RSAUtils.base64Encrypt(clientId, rsaKeyPair.getPublicKey().getEncoded()))
-                .put("publicKey", rsaKeyPair.getBase64PublicKey())
+                .put(CommonContent.HTTP_HEADER_CLIENT, RSAUtils.base64Encrypt(clientId, safetyManager.getRsaPublicKey()))
+                .put(CommonContent.HTTP_HEADER_PUBLICKEY, safetyManager.getBase64RsaPublicKey())
                 .hashMap();
     }
 
@@ -105,27 +118,27 @@ public class AuthServiceImpl implements AuthService {
      * Login string.
      *
      * @param authUser 认证封装对象
-     * @param cid   cid
+     * @param clientId   clientId
      * @return the string
      * @throws Exception the exception
      */
     @Override
-    public String login(JwtUser authUser, String cid) throws Exception {
+    public Map<String, String> login(LUserVo authUser, String clientId) throws Exception {
         String account = authUser.getUsername();
         String secret = authUser.getPassword();
 
-        RSAPrivateKey privateKey = rsaKeyPair.getPrivateKey();
-        account = RSAUtils.base64Decrypt(account, privateKey.getEncoded());
-        secret = RSAUtils.base64Decrypt(secret, privateKey.getEncoded());
+        RSAPrivateKey privateKey = safetyManager.getRsaPrivetKey();
+        account = RSAUtils.base64Decrypt(account, privateKey);
+        secret = RSAUtils.base64Decrypt(secret, privateKey);
 
         Authentication authenticate = authenticationConfiguration.getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(account, secret));
 
         JwtUser jwtUser = (JwtUser) authenticate.getPrincipal();
 
-        String clientId = RSAUtils.base64Decrypt(cid, privateKey.getEncoded());
+        String redisClientName = CommonContent.REDIS_PREFIX_CLIENT + clientId;
         String username = jwtUser.getUsername();
         //判断是否已登录,如已登录,则拒绝登录操作
-        if (clientRedisTemplate.opsForHash().hasKey(clientId, username)) {
+        if (clientRedisTemplate.opsForHash().hasKey(redisClientName, username)) {
             throw ServletResponseEnum.AUTH_LOGIN_REPEAT_ERROR.newException();
         }
         String userId = jwtUser.getId().toString();
@@ -133,57 +146,56 @@ public class AuthServiceImpl implements AuthService {
             throw ServletResponseEnum.AUTH_LOGIN_REPEAT_ERROR.newException();
         }
         //存入userId
-        clientRedisTemplate.opsForHash().put(clientId, username, userId);
-        //重置client过期时间
-        clientRedisTemplate.expire(clientId, authProperties.getClient().getExpire(), TimeUnit.HOURS);
-        String userToken = authProperties.getJwt().getToken().getHeader() + jwtTokenUtil.generate(getPayload(jwtUser, cid), privateKey);
+        clientRedisTemplate.opsForHash().put(redisClientName, username, userId);
+        //生成token
+        String userToken = jwtProp.getAccessPrefix() + jwtTokenUtil.generate(getPayload(jwtUser.getUsername(), RSAUtils.base64Encrypt(clientId, safetyManager.getRsaPublicKey())), privateKey);
         //将user存入redis实现登录操作
-        userRedisTemplate.opsForValue().set(userId, jwtUser);
-        userRedisTemplate.expire(userId, authProperties.getJwt().getExpire(), TimeUnit.HOURS);
+        String redisUserName = CommonContent.REDIS_PREFIX_USER + userId;
+        userRedisTemplate.opsForValue().set(redisUserName, jwtUser);
+        userRedisTemplate.expire(redisUserName, jwtProp.getAccessExpire(), TimeUnit.SECONDS);
 
-        return userToken;
+        return new Maps<String, String>()
+                .put(CommonContent.HTTP_HEADER_ACCESS_TOKEN, userToken)
+                .put("nickname", jwtUser.getNickname())
+                .put("desc", jwtUser.getDesc())
+                .put("avatar", jwtUser.getAvatar())
+                .hashMap();
     }
 
     /**
      * Registry.
      *
      * @param rUserVo      rUserVo
-     * @param cid       cid
+     * @param clientId       clientId
      */
     @Override
-    public ResponseResult<Void> registry(RUserVo rUserVo, String cid) throws Exception {
-        //校验cid
-        CommonResponseEnum.STRING_ERROR.isBlank(cid);
-
-        byte[] privateKey = rsaKeyPair.getPrivateKey().getEncoded();
-        //解密cid获得clientId
-        String clientId = RSAUtils.base64Decrypt(cid, privateKey);
-        ServletResponseEnum.CLIENT_ID_ERROR.validateClientId(clientId);
+    public ResponseResult<Void> registry(RUserVo rUserVo, String clientId) throws Exception {
+        RSAPrivateKey rsaprivateKey = safetyManager.getRsaPrivetKey();
         //解密code
-        String code = RSAUtils.base64Decrypt(rUserVo.getCode(), privateKey);
-        BusinessResponseEnum.CAPTCHA_ERROR.validateCaptcha(code, 6);
+        Integer mailCaptchaSize = captchaProp.getParam("mail").getSize();
+        String code = RSAUtils.base64Decrypt(rUserVo.getCode(), rsaprivateKey);
+        BusinessResponseEnum.CAPTCHA_ERROR.validateCaptcha(code, mailCaptchaSize);
         //获取redis中的code
-        String redisCode = (String) captchaRedisTemplate.opsForValue().get(ZBlogContent.CAPTCHA_REDIS_PREFIX + clientId);
-        BusinessResponseEnum.CAPTCHA_ERROR.validateCaptcha(redisCode, 6);
+        String redisCode = (String) captchaRedisTemplate.opsForValue().get(CommonContent.REDIS_PREFIX_CAPTCHA + clientId);
+        BusinessResponseEnum.CAPTCHA_EXPIRE_ERROR.validateCaptcha(redisCode, mailCaptchaSize);
 
         if (!code.equals(redisCode)) {
             return BusinessResponseEnum.CAPTCHA_ERROR.getResult();
         }
         //校验mail
-        String mail = RSAUtils.base64Decrypt(rUserVo.getMail(), privateKey);
+        String mail = RSAUtils.base64Decrypt(rUserVo.getMail(), rsaprivateKey);
         BusinessResponseEnum.MAIL_BOX_ERROR.validateMail(mail);
         //校验password
-        String password = RSAUtils.base64Decrypt(rUserVo.getPassword(), privateKey);
+        String password = RSAUtils.base64Decrypt(rUserVo.getPassword(), rsaprivateKey);
         BusinessResponseEnum.REGISTRY_PASSWORD_ERROR.validatePassword(password);
+        //校验nickname
+        String nickname = RSAUtils.base64Decrypt(rUserVo.getNickname(), rsaprivateKey);
+        BusinessResponseEnum.REGISTRY_NICKNAME_ERROR.validateNickname(nickname);
         //读取个人简介
-        String desc = new String(Base64Utils.decodeFromString(rUserVo.getDesc()));
+        String desc = RSAUtils.base64Decrypt(rUserVo.getDesc(), rsaprivateKey);
+        BusinessResponseEnum.REGISTRY_DESCRIPTION_ERROR.validateDescription(desc);
 
-        User user = User.builder()
-                .nickname(rUserVo.getNickname())
-                .mail(mail)
-                .secret(password)
-                .profile(desc)
-                .build();
+        User user = User.builder().nickname(nickname).mail(mail).secret(passwordEncoder.encode(password)).profile(desc).build();
 
         //注册
         if (userMapper.hasUser(rUserVo.getMail()) > 0) {
@@ -191,12 +203,12 @@ public class AuthServiceImpl implements AuthService {
         }
 
         userMapper.insert(user);
-        Long userId = userMapper.findIdByMail(rUserVo.getMail());
+        Long userId = userMapper.findIdByMail(user.getMail());
         UserRole userRole = new UserRole();
         userRole.setUid(userId);
 
-        //授权基本权限user
-        Long roleId = roleMapper.findIdByName(ZBlogContent.DEFAULT_USER_ROLE_NAME);
+        //授权 基本权限user
+        Long roleId = roleMapper.findIdByName(CommonContent.BASIC_ROLE);
         if (roleId == null) {
             return BusinessResponseEnum.REGISTRY_AUTHORIZATION_ERROR.getResult();
         }
@@ -206,20 +218,29 @@ public class AuthServiceImpl implements AuthService {
         return BusinessResponseEnum.REGISTRY_SUCCESS.getResult();
     }
 
-    private Payload getPayload(JwtUser jwtUser, String cid) {
+    @Override
+    public void changeUserinfo(UserinfoVo userinfoVo, String userId) {
+        userService.change(userinfoVo.getNickname(), userinfoVo.getDesc(), userId);
+        JwtUser jwtUser = (JwtUser) userRedisTemplate.opsForValue().get(CommonContent.REDIS_PREFIX_USER + userId);
+        jwtUser.setNickname(userinfoVo.getNickname());
+        jwtUser.setDesc(userinfoVo.getDesc());
+        userRedisTemplate.opsForValue().set(CommonContent.REDIS_PREFIX_USER + userId, jwtUser, jwtProp.getAccessExpire(), TimeUnit.SECONDS);
+    }
+
+    @Override
+    public FileVo uploadAvatar(MultipartFile file) throws IOException {
+        return uploadService.uploadPhoto(new MultipartFile[]{file}).get(0);
+    }
+
+    private JwtPayload getPayload(String account, String cid) {
         LocalDateTime now = LocalDateTime.now();
-        return Payload.builder()
-                .sub(authProperties.getJwt().getToken().getSub())
-                .iss(authProperties.getJwt().getToken().getIss())
+        return JwtPayload.builder()
+                .sub(jwtProp.getAccessSub())
+                .iss(jwtProp.getAccessIss())
                 .iat(now.toEpochSecond(ZoneOffset.of("+8")))
-                .exp(now.plusHours(3).toEpochSecond(ZoneOffset.of("+8")))
                 .jti(UUID.randomUUID().toString())
                 .cid(cid)
-                .username(jwtUser.getUsername())
-                .mail(jwtUser.getMail())
-                .nickname(jwtUser.getNickname())
-                .desc(jwtUser.getDesc())
-                .roles(jwtUser.getRoles())
+                .account(account)
                 .build();
     }
 }

@@ -54,4 +54,9 @@ public enum CommonResponseEnum implements CommonAssert {
     public ResponseResult<Void> getResult() {
         return new ResponseResult<Void>(status, message);
     }
+
+    @Override
+    public <T> ResponseResult<T> getResult(T data) {
+        return new ResponseResult<T>(status, message, data);
+    }
 }

@@ -1,12 +1,19 @@
+project:
+  host: www.jxzou.com
+
 server:
   port: 8080
 
 spring:
   profiles:
-    active: dev
-    include: core, auth, exception, redis
+    active: prod
+    include: core, auth, exception, redis, business, mail
   application:
     name: Z-Blog
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   mvc:
     servlet:
       path: /api/
@@ -16,7 +23,28 @@ spring:
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: jx_zou8023
+    hikari:
+      allow-pool-suspension: true
+  mail:
+    username: jx.zou@foxmail.com
+    password: vhgocldxoevfbicb
+    host: smtp.qq.com
+    port: 465
+    protocol: smtps
+    test-connection: true
+    properties:
+      mail:
+        smtp:
+          connection-timeout: 5000
+          timeout: 3000
+          write timeout: 5000
+          starttls:
+            enable: true
+            required: true
 
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
 
 logging:
   file:

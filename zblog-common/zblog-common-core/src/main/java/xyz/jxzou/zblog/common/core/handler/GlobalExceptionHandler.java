@@ -83,7 +83,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ArgumentException.class)
     public ResponseResult<Void> handleArgumentException(ArgumentException e) {
         log.error(e.getMessage(), e);
-        return new ResponseResult<Void>(e.getResult().getStatus(), getMessage(e));
+//        return new ResponseResult<Void>(e.getResult().getStatus(), getMessage(e));
+        return CommonResponseEnum.NETWORK_ERROR.getResult();
     }
 
     /**
@@ -95,7 +96,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CommonException.class)
     public ResponseResult<Void> handleCommonException(CommonException e) {
         log.error(e.getMessage(), e);
-        return new ResponseResult<Void>(e.getResult().getStatus(), getMessage(e));
+//        return new ResponseResult<Void>(e.getResult().getStatus(), getMessage(e));
+        return CommonResponseEnum.NETWORK_ERROR.getResult();
     }
 
     /**
@@ -107,7 +109,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ServletException.class)
     public ResponseResult<Void> handleServletException(ServletException e) {
         log.error(e.getMessage(), e);
-        return new ResponseResult<Void>(e.getResult().getStatus(), getMessage(e));
+//        return new ResponseResult<Void>(e.getResult().getStatus(), getMessage(e));
+        return CommonResponseEnum.NETWORK_ERROR.getResult();
     }
 
     /**
@@ -119,7 +122,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ResponseResult<Void> handleBusinessException(BusinessException e) {
         log.error(e.getMessage(), e);
-        return new ResponseResult<Void>(e.getResult().getStatus(), getMessage(e));
+//        return new ResponseResult<Void>(e.getResult().getStatus(), getMessage(e));
+        return CommonResponseEnum.NETWORK_ERROR.getResult();
     }
 
     /**
@@ -131,7 +135,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BaseException.class)
     public ResponseResult<Void> handleBaseException(BaseException e) {
         log.error(e.getMessage(), e);
-        return new ResponseResult<Void>(e.getResult().getStatus(), getMessage(e));
+//        return new ResponseResult<Void>(e.getResult().getStatus(), getMessage(e));
+        return CommonResponseEnum.NETWORK_ERROR.getResult();
     }
 
     /**
@@ -197,10 +202,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseResult<Void> handleException(Exception e){
         log.error(e.getMessage(), e);
-        int code = CommonResponseEnum.SERVER_ERROR.getStatus();
-        if (isProd){
-            return new ResponseResult<Void>(code, getMessage(code));
-        }
-        return new ResponseResult<Void>(code, e.getMessage());
+        return CommonResponseEnum.ERROR.getResult();
     }
 }

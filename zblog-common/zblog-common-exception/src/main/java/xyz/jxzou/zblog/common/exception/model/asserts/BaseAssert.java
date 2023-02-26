@@ -15,6 +15,8 @@ public interface BaseAssert<E extends BaseException> {
 
     ResponseResult<Void> getResult();
 
+    <T> ResponseResult<T> getResult(T data);
+
     E newException(Object... args);
 
     E newException(Throwable t, Object... args);

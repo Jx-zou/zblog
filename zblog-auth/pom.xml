@@ -42,5 +42,11 @@
 			<artifactId>zblog-service-user</artifactId>
 			<version>0.0.1</version>
 		</dependency>
+		<dependency>
+			<groupId>xyz.jxzou.zblog</groupId>
+			<artifactId>zblog-upload</artifactId>
+			<version>0.0.1</version>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 </project>

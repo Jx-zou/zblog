@@ -17,11 +17,5 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 @ConfigurationProperties("mail")
 public class MailConfiguration {
 
-    private Captcha captcha;
     private ThreadPool threadPool;
-
-    @Bean
-    public JavaMailSender javaMailSender() {
-        return new JavaMailSenderImpl();
-    }
 }

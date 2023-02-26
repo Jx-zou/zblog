@@ -6,8 +6,8 @@ import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
 import org.springframework.stereotype.Component;
-import xyz.jxzou.zblog.auth.domain.dto.Payload;
-import xyz.jxzou.zblog.auth.domain.vo.JwtUser;
+import xyz.jxzou.zblog.auth.domain.pojo.dto.JwtPayload;
+import xyz.jxzou.zblog.auth.domain.pojo.dto.JwtUser;
 import xyz.jxzou.zblog.common.exception.enums.ServletResponseEnum;
 import xyz.jxzou.zblog.common.exception.model.exception.ServletException;
 
@@ -24,16 +24,14 @@ public class JwtTokenUtil {
     /**
      * Generate string.
      *
-     * @param payloadDto    the payload dto
+     * @param jwtPayload    the payload dto
      * @param rsaPrivateKey the rsa private key
      * @return the string
      * @throws JOSEException the jose exception
      */
-    public String generate(Payload payloadDto, RSAPrivateKey rsaPrivateKey) throws JOSEException {
-        JWSHeader jwsHeader = new JWSHeader
-                .Builder(JWSAlgorithm.RS256)
-                .type(JOSEObjectType.JWT).build();
-        com.nimbusds.jose.Payload payload = new com.nimbusds.jose.Payload(JSON.toJSONString(payloadDto));
+    public String generate(JwtPayload jwtPayload, RSAPrivateKey rsaPrivateKey) throws JOSEException {
+        JWSHeader jwsHeader = new JWSHeader.Builder(JWSAlgorithm.RS256).type(JOSEObjectType.JWT).build();
+        Payload payload = new Payload(JSON.toJSONString(jwtPayload));
         JWSObject jwsObject = new JWSObject(jwsHeader, payload);
         JWSSigner jwsSigner = new RSASSASigner(rsaPrivateKey);
         jwsObject.sign(jwsSigner);
@@ -50,13 +48,13 @@ public class JwtTokenUtil {
      * @throws ServletException the servlet exception
      * @throws JOSEException    the jose exception
      */
-    public Payload verify(String token, RSAPublicKey rsaPublicKey) throws ParseException, ServletException, JOSEException {
+    public JwtPayload verify(String token, RSAPublicKey rsaPublicKey) throws ParseException, ServletException, JOSEException {
         JWSObject jwsObject = JWSObject.parse(token);
         RSASSAVerifier verifier = new RSASSAVerifier(rsaPublicKey);
         if (!jwsObject.verify(verifier)) {
             throw ServletResponseEnum.AUTH_FAILED_ERROR.newException();
         }
-        return JSON.parseObject(jwsObject.getPayload().toString(), Payload.class);
+        return JSON.parseObject(jwsObject.getPayload().toString(), JwtPayload.class);
     }
 
     /**
@@ -70,7 +68,7 @@ public class JwtTokenUtil {
      * @throws JOSEException    the jose exception
      */
     public String getUsername(String token, RSAPublicKey rsaPublicKey) throws ParseException, ServletException, JOSEException {
-        String jsonJwtUser = this.verify(token, rsaPublicKey).getUsername();
+        String jsonJwtUser = this.verify(token, rsaPublicKey).getAccount();
         return JSON.parseObject(jsonJwtUser, JwtUser.class).getUsername();
     }
 }

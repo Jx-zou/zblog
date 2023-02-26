@@ -1,15 +1,12 @@
 package xyz.jxzou.zblog.service.business.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
 @Builder
 @TableName(value = "template", schema = "business")
 public class Template {
@@ -22,8 +19,8 @@ public class Template {
     private Integer type;
     @TableField
     private String content;
-    @TableField
+    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
-    @TableField
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 }

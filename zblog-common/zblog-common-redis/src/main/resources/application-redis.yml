@@ -5,6 +5,7 @@ redis:
     captcha: 2
     business: 10
   host: localhost
+  password: jx_zou8023
   port: 6379
   timeout: 3000
   pool:

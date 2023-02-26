@@ -1,6 +1,7 @@
 package xyz.jxzou.zblog.mail.domain.template;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -9,10 +10,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import org.thymeleaf.templateresolver.ITemplateResolver;
-import org.thymeleaf.templateresolver.StringTemplateResolver;
-import xyz.jxzou.zblog.mail.domain.entity.Mail;
-import xyz.jxzou.zblog.mail.domain.handler.MailTemplateHandler;
+import xyz.jxzou.zblog.common.core.handler.TemplateFrameworkHandler;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -24,15 +22,15 @@ import java.util.UUID;
 /**
  * The type Mail template.
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class MailTemplate {
 
     private final JavaMailSender javaMailSender;
+    private final TemplateFrameworkHandler templateFrameworkHandler;
 
-    private final MailTemplateHandler mailTemplateHandler;
-
-    @Value("spring.mail.username")
+    @Value("${spring.mail.username}")
     private String defaultFrom;
 
     private String getFileName(MultipartFile file) {
@@ -88,12 +86,12 @@ public class MailTemplate {
      * @param to       the to
      */
     @Async("mailTreadPoolTaskExecutor")
-    public void sendStringMail(String template, Map<String, Object> params, String from, String text, String subject, Date sentDate, String... to) {
+    public void sendStringMail(String template, Map<String, String> params, String from, String text, String subject, Date sentDate, String... to) {
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setFrom(from);
         simpleMailMessage.setTo(to);
         simpleMailMessage.setSubject(subject);
-        simpleMailMessage.setText(mailTemplateHandler.templateToString(template, params));
+        simpleMailMessage.setText(templateFrameworkHandler.process(template, params));
         simpleMailMessage.setSentDate(sentDate);
         javaMailSender.send(simpleMailMessage);
     }
@@ -144,7 +142,7 @@ public class MailTemplate {
      */
     @Async("mailTreadPoolTaskExecutor")
     public void sendHtmlMail(String subject, String text, String... to) throws MessagingException {
-        javaMailSender.send(mimeMessageHelper(true, this.getDefaultFrom(), text, subject, to).getMimeMessage());
+        javaMailSender.send(mimeMessageHelper(true, defaultFrom, text, subject, to).getMimeMessage());
     }
 
     /**
@@ -157,8 +155,8 @@ public class MailTemplate {
      * @throws MessagingException the messaging exception
      */
     @Async("mailTreadPoolTaskExecutor")
-    public void sendHtmlMail(String template, String subject, Map<String, Object> params, String... to) throws MessagingException {
-        javaMailSender.send(mimeMessageHelper(true, this.getDefaultFrom(), mailTemplateHandler.templateToString(template, params), subject, to).getMimeMessage());
+    public void sendHtmlMail(String template, String subject, Map<String, String> params, String... to) throws MessagingException {
+        javaMailSender.send(mimeMessageHelper(true, templateFrameworkHandler.process(template, params), null, subject, to).getMimeMessage());
     }
 
     /**
@@ -195,8 +193,8 @@ public class MailTemplate {
      * @throws MessagingException the messaging exception
      */
     @Async("mailTreadPoolTaskExecutor")
-    public void sendAttachmentHtmlMail(String template,Map<String, Object> params, String from, String subject, MultipartFile multipartFile, String... to) throws MessagingException {
-        MimeMessageHelper helper = mimeMessageHelper(true, from, mailTemplateHandler.templateToString(template, params), subject, to);
+    public void sendAttachmentHtmlMail(String template,Map<String, String> params, String from, String subject, MultipartFile multipartFile, String... to) throws MessagingException {
+        MimeMessageHelper helper = mimeMessageHelper(true, from, templateFrameworkHandler.process(template, params), subject, to);
         if (!multipartFile.isEmpty()) {
             String fileName = getFileName(multipartFile);
             if (StringUtils.isNotBlank(fileName)) {
@@ -238,8 +236,8 @@ public class MailTemplate {
      * @throws MessagingException the messaging exception
      */
     @Async("mailTreadPoolTaskExecutor")
-    public void sendInlineHtmlMail(String template,Map<String, Object> params, String from, String text, String subject,  String inline, File file, String... to) throws MessagingException {
-        MimeMessageHelper helper = mimeMessageHelper(true, from, mailTemplateHandler.templateToString(template, params), subject, to);
+    public void sendInlineHtmlMail(String template,Map<String, String> params, String from, String text, String subject,  String inline, File file, String... to) throws MessagingException {
+        MimeMessageHelper helper = mimeMessageHelper(true, from, templateFrameworkHandler.process(template, params), subject, to);
         helper.addInline(inline, file);
         javaMailSender.send(helper.getMimeMessage());
     }
@@ -268,19 +266,10 @@ public class MailTemplate {
     public MimeMessageHelper mimeMessageHelper(boolean isHtml, String text, String from, String subject, String... to) throws MessagingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
-        helper.setFrom(from);
+        helper.setFrom(defaultFrom);
         helper.setTo(to);
         helper.setSubject(subject);
         helper.setText(text, isHtml);
         return helper;
-    }
-
-    /**
-     * Gets default from.
-     *
-     * @return the default from
-     */
-    public String getDefaultFrom() {
-        return defaultFrom;
     }
 }

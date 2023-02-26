@@ -1,43 +1,40 @@
 package xyz.jxzou.zblog.common.core.config;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
-import xyz.jxzou.zblog.common.core.pojo.RSAKeyPair;
-import xyz.jxzou.zblog.common.core.pojo.ZBlogContent;
-import xyz.jxzou.zblog.common.core.util.RSAUtils;
+import xyz.jxzou.zblog.common.core.domain.pojo.CommonContent;
 import xyz.jxzou.zblog.redis.processor.DynamicRedisTemplateProcessor;
 
+@Getter
 @Configuration
 @RequiredArgsConstructor
 public class GlobalConfiguration {
 
-    private final RsaProperties rsaProp;
+    private final RsaProp rsa;
+    private final JwtProp jwt;
+    private final CaptchaProp captcha;
     private final DynamicRedisTemplateProcessor redisTemplateProcessor;
-
-    @Bean("rsaKeyPair")
-    public RSAKeyPair rsaKeyPair() {
-        return RSAUtils.generateRSAKeyPair(rsaProp.getSize());
-    }
 
     @Bean("userRedisTemplate")
     public RedisTemplate<String, Object> userRedisTemplate() {
-        return redisTemplateProcessor.getRedisTemplate(ZBlogContent.REDIS_DATABASE_USER_NAME);
+        return redisTemplateProcessor.getRedisTemplate(CommonContent.REDIS_DATABASE_NAME_USER);
     }
 
     @Bean("clientRedisTemplate")
     public RedisTemplate<String, Object> clientRedisTemplate() {
-        return redisTemplateProcessor.getRedisTemplate(ZBlogContent.REDIS_DATABASE_CLIENT_NAME);
+        return redisTemplateProcessor.getRedisTemplate(CommonContent.REDIS_DATABASE_NAME_CLIENT);
     }
 
     @Bean("captchaRedisTemplate")
     public RedisTemplate<String, Object> captchaRedisTemplate() {
-        return redisTemplateProcessor.getRedisTemplate(ZBlogContent.REDIS_DATABASE_CAPTCHA_NAME);
+        return redisTemplateProcessor.getRedisTemplate(CommonContent.REDIS_DATABASE_NAME_CAPTCHA);
     }
 
     @Bean("businessRedisTemplate")
     public RedisTemplate<String, Object> businessRedisTemplate() {
-        return redisTemplateProcessor.getRedisTemplate(ZBlogContent.REDIS_DATABASE_BUSINESS_NAME);
+        return redisTemplateProcessor.getRedisTemplate(CommonContent.REDIS_DATABASE_NAME_BUSINESS);
     }
 }
