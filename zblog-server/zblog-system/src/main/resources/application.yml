@@ -1,0 +1,44 @@
+server:
+  port: 8569
+
+spring:
+  profiles:
+    active: prod
+    include: core, exception, redis, business, mail
+  application:
+    name: Z-Blog
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  mvc:
+    servlet:
+      path: /api/
+
+  mail:
+    username: jx.zou@foxmail.com
+    password: vhgocldxoevfbicb
+    host: smtp.qq.com
+    port: 465
+    protocol: smtps
+    test-connection: true
+    properties:
+      mail:
+        smtp:
+          connection-timeout: 5000
+          timeout: 3000
+          write timeout: 5000
+          starttls:
+            enable: true
+            required: true
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+
+file:
+  path: /yunwei/nginx/html/
+
+logging:
+  file:
+    path: /yunwei/zblog/logs/

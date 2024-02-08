@@ -1,0 +1,17 @@
+spring:
+  mail:
+    username: jx.zou@foxmail.com
+    password: vhgocldxoevfbicb
+    host: smtp.qq.com
+    port: 465
+    protocol: smtps
+    test-connection: true
+    properties:
+      mail:
+        smtp:
+          connection-timeout: 5000
+          timeout: 3000
+          write timeout: 5000
+          starttls:
+            enable: true
+            required: true

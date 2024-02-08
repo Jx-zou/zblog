@@ -1,0 +1,4 @@
+article:
+  cron:
+    article-cache: 0 */1 * * * ?
+  page-size: 10

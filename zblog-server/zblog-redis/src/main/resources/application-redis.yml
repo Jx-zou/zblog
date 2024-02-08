@@ -1,0 +1,15 @@
+redis:
+  databases:
+    client: 0
+    user: 1
+    captcha: 2
+    business: 10
+  host: 192.168.0.200
+  password: jx_zou8023
+  port: 6379
+  timeout: 3000
+  pool:
+    max-active: 100
+    max-wait: -1
+    max-idle: 8
+    min-idle: 0
