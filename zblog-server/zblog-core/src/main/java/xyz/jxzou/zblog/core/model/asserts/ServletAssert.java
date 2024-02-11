@@ -1,8 +1,7 @@
 package xyz.jxzou.zblog.core.model.asserts;
 
-
-import com.sun.istack.internal.Nullable;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.lang.Nullable;
 import xyz.jxzou.zblog.core.pojo.exception.ServletException;
 import xyz.jxzou.zblog.util.model.Result;
 
