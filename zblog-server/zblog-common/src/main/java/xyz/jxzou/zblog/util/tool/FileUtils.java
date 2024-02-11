@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 /**
  * The type File utils.
@@ -43,6 +44,6 @@ public class FileUtils {
      * @return 文件名
      */
     public static String nanoFilename(String suffix) {
-        return NanoIdUtils.randomNanoId() + suffix;
+        return UUID.randomUUID() + suffix;
     }
 }
