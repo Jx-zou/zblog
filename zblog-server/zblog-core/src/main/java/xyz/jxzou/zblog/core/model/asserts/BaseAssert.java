@@ -2,7 +2,7 @@ package xyz.jxzou.zblog.core.model.asserts;
 
 
 import org.springframework.lang.Nullable;
-import xyz.jxzou.zblog.core.model.exception.BaseException;
+import xyz.jxzou.zblog.core.pojo.exception.BaseException;
 import xyz.jxzou.zblog.util.model.Result;
 
 import java.util.Collection;

@@ -5,15 +5,15 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>xyz.jxzou.zblog</groupId>
-        <artifactId>zblog</artifactId>
+        <artifactId>zblog-server</artifactId>
         <version>0.0.1</version>
     </parent>
 
     <artifactId>zblog-redis</artifactId>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 

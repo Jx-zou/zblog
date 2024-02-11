@@ -2,7 +2,7 @@ package xyz.jxzou.zblog.core.model.asserts;
 
 
 import org.apache.commons.lang3.StringUtils;
-import xyz.jxzou.zblog.core.model.exception.BusinessException;
+import xyz.jxzou.zblog.core.pojo.exception.BusinessException;
 import xyz.jxzou.zblog.util.tool.ValidatorUtils;
 
 /**

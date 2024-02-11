@@ -16,11 +16,8 @@ captcha:
       size: 6
       expire: 300
 
-spring:
-  mvc:
-    throw-exception-if-no-handler-found: true
-#  messages:
-#    basename: classpath:/messages
-#    encoding: UTF-8
-#  web:
-#    locale: zh_CN
+  messages:
+    basename: classpath:/messages
+    encoding: UTF-8
+  web:
+    locale: zh_CN

@@ -15,6 +15,11 @@ spring:
     servlet:
       path: /api/
 
+  r2dbc:
+    url: r2dbc:postgresql://127.0.0.1:15432/zblog
+    username: zblog
+    password: zblog
+
   mail:
     username: jx.zou@foxmail.com
     password: vhgocldxoevfbicb

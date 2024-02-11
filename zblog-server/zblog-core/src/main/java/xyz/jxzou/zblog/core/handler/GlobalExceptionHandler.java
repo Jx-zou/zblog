@@ -1,5 +1,6 @@
 package xyz.jxzou.zblog.core.handler;
 
+import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.TypeMismatchException;
@@ -19,14 +20,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
-import org.springframework.web.servlet.NoHandlerFoundException;
-import xyz.jxzou.zblog.core.enums.CommonResponseEnum;
-import xyz.jxzou.zblog.core.enums.ServletResponseEnum;
-import xyz.jxzou.zblog.core.message.UnifiedMessageSource;
-import xyz.jxzou.zblog.core.model.exception.*;
+import xyz.jxzou.zblog.core.model.message.UnifiedMessageSource;
+import xyz.jxzou.zblog.core.pojo.enums.CommonResponseEnum;
+import xyz.jxzou.zblog.core.pojo.enums.ServletResponseEnum;
+import xyz.jxzou.zblog.core.pojo.exception.*;
 import xyz.jxzou.zblog.util.pojo.ResponseResult;
 
-import javax.validation.ValidationException;
 
 /**
  * GlobalExceptionHandler
@@ -156,7 +155,6 @@ public class GlobalExceptionHandler {
      * @return the response result
      */
     @ExceptionHandler({
-            NoHandlerFoundException.class,
             HttpRequestMethodNotSupportedException.class,
             HttpMediaTypeNotSupportedException.class,
             HttpMediaTypeNotAcceptableException.class,
@@ -188,7 +186,7 @@ public class GlobalExceptionHandler {
             log.error("class [{}] not defined in enum {}", e.getClass().getName(), ServletResponseEnum.class.getName());
         }
 
-        return new ResponseResult<Void>(status, e.getMessage());
+        return new ResponseResult<>(status, e.getMessage());
     }
 
     /**

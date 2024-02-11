@@ -25,50 +25,25 @@
         <module>zblog-db</module>
 		<module>zblog-core</module>
 		<module>zblog-redis</module>
-		<module>zblog-util</module>
-        <module>zblog-common</module>
+		<module>zblog-common</module>
     </modules>
 
 	<properties>
-		<maven.compiler.source>8</maven.compiler.source>
-		<maven.compiler.target>8</maven.compiler.target>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<mybatis-plus>3.5.0</mybatis-plus>
-		<postgresql>42.5.1</postgresql>
 		<fastjson2>2.0.23</fastjson2>
-		<jnanoid>2.0.0</jnanoid>
-		<jwt>9.24.4</jwt>
 		<jasypt>3.0.5</jasypt>
-		<beetl>1.2.38.RELEASE</beetl>
+		<beetl>3.15.14.RELEASE</beetl>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>org.postgresql</groupId>
-				<artifactId>postgresql</artifactId>
-				<version>${postgresql}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.baomidou</groupId>
-				<artifactId>mybatis-plus-boot-starter</artifactId>
-				<version>${mybatis-plus}</version>
-			</dependency>
-			<dependency>
 				<groupId>com.alibaba.fastjson2</groupId>
 				<artifactId>fastjson2</artifactId>
 				<version>${fastjson2}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.aventrix.jnanoid</groupId>
-				<artifactId>jnanoid</artifactId>
-				<version>${jnanoid}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.nimbusds</groupId>
-				<artifactId>nimbus-jose-jwt</artifactId>
-				<version>${jwt}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.github.ulisesbocchio</groupId>
@@ -77,7 +52,7 @@
 			</dependency>
 			<dependency>
 				<groupId>com.ibeetl</groupId>
-				<artifactId>beetl-framework-starter</artifactId>
+				<artifactId>beetl-springboot-starter-jdk17</artifactId>
 				<version>${beetl}</version>
 			</dependency>
 		</dependencies>

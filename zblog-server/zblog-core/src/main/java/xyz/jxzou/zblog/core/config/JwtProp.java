@@ -1,13 +1,15 @@
 package xyz.jxzou.zblog.core.config;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 /**
  * The type Jwt prop.
  */
-@Data
+@Setter
+@Getter
 @Configuration
 @ConfigurationProperties(prefix = "safety.jwt")
 public class JwtProp {
@@ -64,7 +66,8 @@ public class JwtProp {
     /**
      * The type Salt.
      */
-    @Data
+    @Setter
+    @Getter
     public static class Salt {
         private Integer size;
     }
@@ -72,7 +75,8 @@ public class JwtProp {
     /**
      * The type Token.
      */
-    @Data
+    @Setter
+    @Getter
     public static class Token {
         private Integer expire;
         private String prefix;

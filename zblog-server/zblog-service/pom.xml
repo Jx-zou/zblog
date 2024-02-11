@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>xyz.jxzou.zblog</groupId>
-		<artifactId>zblog</artifactId>
+		<artifactId>zblog-server</artifactId>
 		<version>0.0.1</version>
 	</parent>
 
@@ -17,8 +17,8 @@
 	</modules>
 
 	<properties>
-		<maven.compiler.source>8</maven.compiler.source>
-		<maven.compiler.target>8</maven.compiler.target>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -26,13 +26,13 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>xyz.jxzou.zblog.common</groupId>
-			<artifactId>zblog-common-core</artifactId>
+			<groupId>xyz.jxzou.zblog</groupId>
+			<artifactId>zblog-core</artifactId>
 			<version>0.0.1</version>
 		</dependency>
 		<dependency>
-			<groupId>xyz.jxzou.zblog.common</groupId>
-			<artifactId>zblog-common-db</artifactId>
+			<groupId>xyz.jxzou.zblog</groupId>
+			<artifactId>zblog-db</artifactId>
 			<version>0.0.1</version>
 		</dependency>
 	</dependencies>

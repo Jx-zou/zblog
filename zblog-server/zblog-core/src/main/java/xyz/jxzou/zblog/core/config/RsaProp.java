@@ -1,10 +1,12 @@
 package xyz.jxzou.zblog.core.config;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-@Data
+@Setter
+@Getter
 @Configuration
 @ConfigurationProperties(prefix = "rsa")
 public class RsaProp {

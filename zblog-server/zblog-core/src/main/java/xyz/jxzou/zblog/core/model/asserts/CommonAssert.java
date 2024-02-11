@@ -1,6 +1,6 @@
 package xyz.jxzou.zblog.core.model.asserts;
 
-import xyz.jxzou.zblog.core.model.exception.CommonException;
+import xyz.jxzou.zblog.core.pojo.exception.CommonException;
 import xyz.jxzou.zblog.util.model.Result;
 
 /**
