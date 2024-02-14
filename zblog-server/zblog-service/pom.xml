@@ -13,7 +13,7 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>zblog-service-business</module>
-		<module>zblog-service-user</module>
+		<module>zblog-service-auth</module>
 	</modules>
 
 	<properties>
@@ -24,6 +24,10 @@
 
 
 	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webflux</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>xyz.jxzou.zblog</groupId>

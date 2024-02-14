@@ -1,35 +1,32 @@
 package xyz.jxzou.zblog.auth.config;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.socket.EnableWebSocketSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.web.authentication.RememberMeServices;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
+import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import xyz.jxzou.zblog.auth.filter.JwtTokenFilter;
-import xyz.jxzou.zblog.auth.handler.AuthenticationAccessDeniedHandler;
-import xyz.jxzou.zblog.auth.handler.LoginFailedHandler;
-import xyz.jxzou.zblog.auth.handler.LoginSuccessHandler;
+import xyz.jxzou.zblog.auth.handler.*;
 import xyz.jxzou.zblog.auth.service.AuthService;
-import xyz.jxzou.zblog.common.core.domain.pojo.SafetyManager;
+import xyz.jxzou.zblog.core.pojo.SafetyManager;
 
 import java.util.Arrays;
 
-@EnableWebSecurity
-@EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
-@RequiredArgsConstructor
+@Configuration
+@EnableWebFluxSecurity
+@EnableReactiveMethodSecurity
 public class SecurityConfig {
 
     private final SafetyManager safetyManager;
@@ -38,61 +35,62 @@ public class SecurityConfig {
     private final LoginSuccessHandler loginSuccessHandler;
     private final LoginFailedHandler loginFailedHandler;
     private final AuthenticationAccessDeniedHandler accessDeniedHandler;
+    private final LogoutSuccessHandler logoutSuccessHandler;
+    private final CsrfDeniedHandler csrfDeniedHandler;
+
+    @Autowired
+    public SecurityConfig(SafetyManager safetyManager, JwtTokenFilter jwtTokenFilter, AuthService authService, LoginSuccessHandler loginSuccessHandler, LoginFailedHandler loginFailedHandler, AuthenticationAccessDeniedHandler accessDeniedHandler, LogoutSuccessHandler logoutSuccessHandler, CsrfDeniedHandler csrfDeniedHandler) {
+        this.safetyManager = safetyManager;
+        this.jwtTokenFilter = jwtTokenFilter;
+        this.authService = authService;
+        this.loginSuccessHandler = loginSuccessHandler;
+        this.loginFailedHandler = loginFailedHandler;
+        this.accessDeniedHandler = accessDeniedHandler;
+        this.logoutSuccessHandler = logoutSuccessHandler;
+        this.csrfDeniedHandler = csrfDeniedHandler;
+    }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .headers(httpSecurityHeadersConfigurer -> httpSecurityHeadersConfigurer
-                        .addHeaderWriter());
+    public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) throws Exception {
+        http.authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec
+                .pathMatchers(HttpMethod.POST, "/login", "logout", "/registry", "/pkey", "/mail/captcha").permitAll()
+                .pathMatchers("/api/search/**").permitAll()
+                .anyExchange().authenticated()
+        );
 
-        http
-                .httpBasic()
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST,
-                                )
-                        .antMatchers("/api/search/**").permitAll()
+        http.formLogin(loginSpec -> loginSpec
+                .loginPage("/login")
+                .authenticationFailureHandler(loginFailedHandler)
+                .authenticationSuccessHandler(loginSuccessHandler)
+        );
 
-                        .mvcMatchers(HttpMethod.POST,
-                                "/login",
-                                "logout",
-                                "/registry",
-                                "/pkey",
-                                "/mail/captcha").servletPath("/api").permitAll()
-                        .anyRequest().authenticated());
+        http.logout(logoutSpec -> logoutSpec
+                .logoutUrl("/logout")
+                .logoutSuccessHandler(logoutSuccessHandler)
+        );
 
-        http
-                .rememberMe(remember -> remember
-                        .userDetailsService(authService));
+        http.exceptionHandling(exceptionHandlingSpec -> exceptionHandlingSpec
+                .accessDeniedHandler(accessDeniedHandler)
+        );
 
-        http
-                .formLogin(login -> login
-                        .loginPage("/login")
-                        .successHandler(loginSuccessHandler)
-                        .failureHandler(loginFailedHandler));
+        http.csrf(csrfSpec -> csrfSpec
+                .accessDeniedHandler(csrfDeniedHandler)
+        );
 
-        http
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .clearAuthentication(true));
-
-        http
-                .exceptionHandling(exception -> exception
-                        .accessDeniedHandler(accessDeniedHandler));
-
-        http
-                .cors().and().csrf().disable()
-                .httpBasic(Customizer.withDefaults())
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .headers().cacheControl();
-
-        http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtTokenFilter, SecurityWebFiltersOrder.FORM_LOGIN);
         return http.build();
     }
+
+    ReactiveUserDetailsService
 
     @Bean
     RememberMeServices rememberMeServices() {
         return new TokenBasedRememberMeServices(safetyManager.getRsaPublicKey().toString(), authService);
+    }
+
+    @Bean
+    GrantedAuthorityDefaults grantedAuthorityDefaults() {
+        return new GrantedAuthorityDefaults("");
     }
 
     @Bean
@@ -105,10 +103,5 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", corsConfiguration);
 
         return source;
-    }
-
-    @Bean
-    GrantedAuthorityDefaults grantedAuthorityDefaults() {
-        return new GrantedAuthorityDefaults("");
     }
 }

@@ -35,7 +35,6 @@
 
 		<fastjson2>2.0.37</fastjson2>
 		<jasypt>3.0.5</jasypt>
-		<beetl>3.15.14.RELEASE</beetl>
 	</properties>
 
 	<dependencyManagement>
@@ -49,11 +48,6 @@
 				<groupId>com.github.ulisesbocchio</groupId>
 				<artifactId>jasypt-spring-boot-starter</artifactId>
 				<version>${jasypt}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.ibeetl</groupId>
-				<artifactId>beetl-springboot-starter-jdk17</artifactId>
-				<version>${beetl}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

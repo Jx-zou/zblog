@@ -45,7 +45,6 @@ public enum ServletResponseEnum implements ServletAssert {
     RSA_REDIS_GET_ERROR(5162, "秘钥查询失败");
 
 
-
     private final Integer status;
     private final String message;
 

@@ -7,15 +7,19 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import xyz.jxzou.zblog.auth.util.ResponseUtils;
-import xyz.jxzou.zblog.core.pojo.enums.ServletResponseEnum;
+import xyz.jxzou.zblog.core.pojo.enums.CommonResponseEnum;
 
+/**
+ * The type CsrfDeniedHandler.
+ *
+ * @author Jx-zou
+ */
 @Slf4j
 @Component
-public class AuthenticationAccessDeniedHandler implements ServerAccessDeniedHandler {
-
+public class CsrfDeniedHandler implements ServerAccessDeniedHandler {
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, AccessDeniedException denied) {
-        log.error("权限不足，无法访问", denied);
-        return ResponseUtils.jsonWriteAndFlushWith(exchange.getResponse(), ServletResponseEnum.PERMISSION_DENIED_ERROR.getResult());
+        log.error("登录错误", denied);
+        return ResponseUtils.jsonWriteAndFlushWith(exchange.getResponse(), CommonResponseEnum.SERVER_ERROR.getResult());
     }
 }

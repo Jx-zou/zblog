@@ -22,33 +22,21 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
+			<artifactId>spring-boot-starter-oauth2-client</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>com.nimbusds</groupId>-->
-<!--			<artifactId>nimbus-jose-jwt</artifactId>-->
-<!--		</dependency>-->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-websocket</artifactId>
-		</dependency>
 
 		<dependency>
-			<groupId>xyz.jxzou.zblog.service</groupId>
-			<artifactId>zblog-service-user</artifactId>
+			<groupId>xyz.jxzou.zblog</groupId>
+			<artifactId>zblog-upload</artifactId>
 			<version>0.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>xyz.jxzou.zblog</groupId>
-			<artifactId>zblog-upload</artifactId>
+			<artifactId>zblog-redis</artifactId>
 			<version>0.0.1</version>
 		</dependency>
 	</dependencies>

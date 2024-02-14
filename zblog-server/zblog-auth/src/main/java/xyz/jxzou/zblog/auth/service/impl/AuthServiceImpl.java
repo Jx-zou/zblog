@@ -19,7 +19,7 @@ import xyz.jxzou.zblog.auth.domain.pojo.dto.JwtUser;
 import xyz.jxzou.zblog.auth.domain.pojo.vo.LUserVo;
 import xyz.jxzou.zblog.auth.domain.pojo.vo.RUserVo;
 import xyz.jxzou.zblog.auth.service.AuthService;
-import xyz.jxzou.zblog.auth.util.JwtTokenUtil;
+import xyz.jxzou.zblog.auth.util.JwtTokenUtils;
 import xyz.jxzou.zblog.common.core.config.CaptchaProp;
 import xyz.jxzou.zblog.common.core.config.JwtProp;
 import xyz.jxzou.zblog.common.core.domain.pojo.CoreContent;
@@ -62,7 +62,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtProp jwtProp;
     private final CaptchaProp captchaProp;
     private final SafetyManager safetyManager;
-    private final JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenUtils jwtTokenUtil;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final UserMapper userMapper;
     private final RoleMapper roleMapper;

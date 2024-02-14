@@ -13,9 +13,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
+import reactor.core.publisher.Mono;
 import xyz.jxzou.zblog.auth.domain.pojo.dto.JwtPayload;
 import xyz.jxzou.zblog.auth.domain.pojo.dto.JwtUser;
-import xyz.jxzou.zblog.auth.util.JwtTokenUtil;
+import xyz.jxzou.zblog.auth.util.JwtTokenUtils;
 import xyz.jxzou.zblog.common.core.config.JwtProp;
 import xyz.jxzou.zblog.common.core.domain.pojo.CoreContent;
 import xyz.jxzou.zblog.common.core.domain.pojo.SafetyManager;
@@ -35,10 +39,10 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JwtTokenFilter extends OncePerRequestFilter {
+public class JwtTokenFilter implements WebFilter {
 
     private final SafetyManager safetyManager;
-    private final JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenUtils jwtTokenUtil;
     private final JwtProp jwtProp;
     @Resource
     private RedisTemplate<String, Object> userRedisTemplate;
@@ -94,5 +98,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             log.error("认证失败");
             ResponseUtils.writeJson(response, CommonResponseEnum.ERROR.getResult());
         }
+    }
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+        return null;
     }
 }

@@ -1,20 +1,21 @@
 package xyz.jxzou.zblog.auth.handler;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.server.WebFilterExchange;
+import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import xyz.jxzou.zblog.common.util.tool.ResponseUtils;
-import xyz.jxzou.zblog.common.exception.enums.ServletResponseEnum;
+import reactor.core.publisher.Mono;
+import xyz.jxzou.zblog.auth.util.ResponseUtils;
+import xyz.jxzou.zblog.core.pojo.enums.ServletResponseEnum;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-
+@Slf4j
 @Component
-public class LoginSuccessHandler implements AuthenticationSuccessHandler {
+public class LoginSuccessHandler implements ServerAuthenticationSuccessHandler {
+
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        ResponseUtils.writeJson(response, ServletResponseEnum.AUTH_LOGIN_SUCCESS.getResult());
+    public Mono<Void> onAuthenticationSuccess(WebFilterExchange exchange, Authentication authentication) {
+        log.info("登录");
+        return ResponseUtils.jsonWriteAndFlushWith(exchange.getExchange().getResponse(), ServletResponseEnum.AUTH_LOGIN_SUCCESS.getResult());
     }
 }
