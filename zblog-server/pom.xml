@@ -19,7 +19,7 @@
 		<module>zblog-service</module>
 		<module>zblog-system</module>
 		<module>zblog-mail</module>
-		<module>zblog-auth</module>
+		<module>zblog-security</module>
 		<module>zblog-upload</module>
 		<module>zblog-im</module>
         <module>zblog-db</module>

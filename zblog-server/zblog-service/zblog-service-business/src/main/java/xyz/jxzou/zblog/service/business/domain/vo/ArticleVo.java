@@ -2,7 +2,6 @@ package xyz.jxzou.zblog.service.business.domain.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
-import xyz.jxzou.zblog.service.user.domain.entity.User;
 
 import java.time.LocalDateTime;
 

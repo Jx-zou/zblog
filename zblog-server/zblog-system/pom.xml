@@ -29,7 +29,7 @@
 		</dependency>
 		<dependency>
 			<groupId>xyz.jxzou.zblog</groupId>
-			<artifactId>zblog-auth</artifactId>
+			<artifactId>zblog-security</artifactId>
 			<version>0.0.1</version>
 		</dependency>
 		<dependency>
